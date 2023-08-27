@@ -4,20 +4,38 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/TeodorStamenov/outdoorsy/util"
 	_ "github.com/lib/pq"
 )
 
-func Connect(conn string) {
-	repo, err := sql.Open("postgres", conn)
+type Db interface {
+}
+
+type Postgres struct {
+	db *sql.DB
+}
+
+func NewDb(c util.Config) (Db, error) {
+	conn := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		c.Db.Addr, c.Db.Port, c.Db.User, c.Db.Pass, c.Db.Name)
+
+	fmt.Printf("Database trying to connect with: %s\n", conn)
+
+	db, err := sql.Open("postgres", conn)
 	if err != nil {
 		panic(err)
 	}
-	defer repo.Close()
+	defer db.Close()
 
-	err = repo.Ping()
+	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Successfully connected!")
+
+	return Postgres{
+		db: db,
+	}, err
 }

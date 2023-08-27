@@ -10,8 +10,14 @@ type DbConfig struct {
 	Name string `mapstructure:"dbname"`
 }
 
+type ServiceConfig struct {
+	Addr string `mapstructure:"address"`
+	Port string `mapstructure:"port"`
+}
+
 type Config struct {
-	Db DbConfig `mapstructure:"db"`
+	Db      DbConfig      `mapstructure:"db"`
+	Service ServiceConfig `mapstructure:"service"`
 }
 
 var vp *viper.Viper

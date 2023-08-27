@@ -5,5 +5,9 @@
         "user": "root",
         "password": "root",
         "dbname": "testingwithrentals"
+    },
+    "service": {
+        "address": "127.0.0.1",
+        "port": "8000"
     }
 }
