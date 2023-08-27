@@ -1,6 +1,9 @@
 {
     "db": {
-        "address": "localhost",
-        "port": "5555"
+        "address": "127.0.0.1",
+        "port": "5434",
+        "user": "root",
+        "password": "root",
+        "dbname": "testingwithrentals"
     }
 }

@@ -5,6 +5,9 @@ import "github.com/spf13/viper"
 type DbConfig struct {
 	Addr string `mapstructure:"address"`
 	Port string `mapstructure:"port"`
+	User string `mapstructure:"user"`
+	Pass string `mapstructure:"password"`
+	Name string `mapstructure:"dbname"`
 }
 
 type Config struct {
