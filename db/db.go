@@ -12,6 +12,7 @@ import (
 type Db interface {
 	GetVehicle(int) ([]models.Vehicle, error)
 	GetUser(int) (models.User, error)
+	FilterPrice(int, int) ([]models.Vehicle, error)
 }
 
 type Postgres struct {
@@ -43,7 +44,7 @@ func NewDb(c util.Config) (Db, error) {
 }
 
 func (p *Postgres) GetVehicle(id int) ([]models.Vehicle, error) {
-	sqlStatement := `SELECT user_id, name, type FROM rentals WHERE user_id=$1;`
+	sqlStatement := `SELECT user_id, name, type, price_per_day FROM rentals WHERE user_id=$1;`
 
 	rows, err := p.db.Query(sqlStatement, id)
 	if err != nil {
@@ -53,7 +54,7 @@ func (p *Postgres) GetVehicle(id int) ([]models.Vehicle, error) {
 	vehicles := make([]models.Vehicle, 0)
 	for rows.Next() {
 		v := models.Vehicle{}
-		err = rows.Scan(&v.Id, &v.Name, &v.Type)
+		err = rows.Scan(&v.Id, &v.Name, &v.Type, &v.PricePerDay)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -76,4 +77,25 @@ func (p *Postgres) GetUser(id int) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (p *Postgres) FilterPrice(priceMin, priceMax int) ([]models.Vehicle, error) {
+	sqlStatement := `SELECT user_id, name, type, price_per_day FROM rentals WHERE price_per_day >= $1 AND price_per_day <= $2;`
+
+	rows, err := p.db.Query(sqlStatement, priceMin, priceMax)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	vehicles := make([]models.Vehicle, 0)
+	for rows.Next() {
+		v := models.Vehicle{}
+		err = rows.Scan(&v.Id, &v.Name, &v.Type, &v.PricePerDay)
+		if err != nil {
+			fmt.Println(err)
+		}
+		vehicles = append(vehicles, v)
+	}
+
+	return vehicles, nil
 }

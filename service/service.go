@@ -20,6 +20,7 @@ func NewService(c util.Config, db db.Db) (*Service, error) {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/rentals/{rental_id}", s.Rental)
+	router.HandleFunc("/rentals", s.FilterPrice).Queries("price_min", "{price_min[0-9]+}", "price_max", "{price_max[0-9]+}")
 
 	srv := &http.Server{
 		Addr:    addr,
