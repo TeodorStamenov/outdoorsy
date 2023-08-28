@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/TeodorStamenov/outdoorsy/db"
-	"github.com/TeodorStamenov/outdoorsy/handlers"
 	"github.com/TeodorStamenov/outdoorsy/util"
+	"github.com/gorilla/mux"
 )
 
 type Service struct {
@@ -14,24 +14,24 @@ type Service struct {
 	srv *http.Server
 }
 
-func NewService(c util.Config, db db.Db) (Service, error) {
+func NewService(c util.Config, db db.Db) (*Service, error) {
+	var s Service
 	addr := fmt.Sprintf("%s:%s", c.Service.Addr, c.Service.Port)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/rentals", handlers.Rental)
+	router := mux.NewRouter()
+	router.HandleFunc("/rentals/{rental_id}", s.Rental)
 
 	srv := &http.Server{
 		Addr:    addr,
-		Handler: mux,
+		Handler: router,
 	}
 
-	return Service{
-		db:  db,
-		srv: srv,
-	}, nil
+	s.db = db
+	s.srv = srv
+	return &s, nil
 }
 
-func (s Service) Run() {
+func (s *Service) Run() {
 	err := s.srv.ListenAndServe()
 	if err != nil {
 		panic(err)

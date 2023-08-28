@@ -4,11 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/TeodorStamenov/outdoorsy/models"
 	"github.com/TeodorStamenov/outdoorsy/util"
 	_ "github.com/lib/pq"
 )
 
 type Db interface {
+	GetVehicle(int) ([]models.Vehicle, error)
+	GetUser(int) (models.User, error)
 }
 
 type Postgres struct {
@@ -26,7 +29,6 @@ func NewDb(c util.Config) (Db, error) {
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
@@ -35,7 +37,43 @@ func NewDb(c util.Config) (Db, error) {
 
 	fmt.Println("Successfully connected!")
 
-	return Postgres{
+	return &Postgres{
 		db: db,
 	}, err
+}
+
+func (p *Postgres) GetVehicle(id int) ([]models.Vehicle, error) {
+	sqlStatement := `SELECT user_id, name, type FROM rentals WHERE user_id=$1;`
+
+	rows, err := p.db.Query(sqlStatement, id)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	vehicles := make([]models.Vehicle, 0)
+	for rows.Next() {
+		v := models.Vehicle{}
+		err = rows.Scan(&v.Id, &v.Name, &v.Type)
+		if err != nil {
+			fmt.Println(err)
+		}
+		vehicles = append(vehicles, v)
+	}
+
+	return vehicles, nil
+}
+
+func (p *Postgres) GetUser(id int) (models.User, error) {
+	sqlStatement := `SELECT * FROM users WHERE id=$1;`
+
+	row := p.db.QueryRow(sqlStatement, id)
+
+	user := models.User{}
+
+	err := row.Scan(&user.Id, &user.FirstName, &user.LastName)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return user, nil
 }
