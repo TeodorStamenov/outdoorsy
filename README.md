@@ -1,8 +1,4 @@
-# outdoorsy
-
-Coding Challenge
-
-Thanks for applying for a backend role at Outdoorsy. We've put together this code challenge, which should take around 3-4 hours to complete.
+Coding Challenge.
 Functionality
 
 The task is to develop a rentals JSON API that returns a list of rentals that can be filtered, sorted, and paginated. We have included files to create a database of rentals.
